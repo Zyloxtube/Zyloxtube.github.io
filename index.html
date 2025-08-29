@@ -1,34 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zyloxtube - Rick Roll Video</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #000;
-            color: white;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-        }
-        video {
-            max-width: 100%;
-            height: auto;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>موقعي - الصفحة الرئيسية</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <h1>Welcome to Zyloxtube</h1>
-    <p>Enjoy the Rick Roll video!</p>
-
-    <!-- فيديو مدمج -->
-    <video controls autoplay>
-        <source src="https://zyloxtube.github.io/RickRoll.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
-
+<header><h1>📺 موقعي</h1></header>
+<div class="videos" id="videoList"></div>
+<script src="script.js"></script>
+<script>
+  loadDBAndDisplayVideos();
+</script>
 </body>
 </html>
