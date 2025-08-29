@@ -1,12 +1,12 @@
 const gistRawUrl = "https://gist.githubusercontent.com/Zyloxtube/b6e8faa92098c05976412ea2246482c1/raw/database.json";
 const gistId = "b6e8faa92098c05976412ea2246482c1";
-const token = "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"; // استبدله بالتوكن الخاص بك
+const token = "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"; // ضع التوكن هنا
 
 let dbData = null;
 let currentVideo = null;
 let currentChannel = null;
 
-// تحميل قاعدة البيانات من Gist
+// قراءة البيانات من Gist
 async function loadDB() {
   const res = await fetch(gistRawUrl);
   dbData = await res.json();
@@ -35,14 +35,13 @@ async function loadDBAndDisplayVideos() {
   });
 }
 
-// عرض الفيديو الحالي في watch.html
+// عرض الفيديو الحالي
 async function displayCurrentVideo() {
   await loadDB();
   const videoId = localStorage.getItem("currentVideoId");
   currentVideo = dbData.videos.find(v => v.videoId === videoId);
   currentChannel = dbData.channels.find(c => c.channelId === currentVideo.channelId);
 
-  // زيادة المشاهدات مؤقتاً
   currentVideo.views = (currentVideo.views || 0) + 1;
 
   document.getElementById("videoContainer").innerHTML = `
@@ -63,10 +62,8 @@ async function displayCurrentVideo() {
       </div>
     </div>
   `;
-
   loadComments(videoId);
 
-  // أزرار اللايك والديسلايك
   document.getElementById("likeBtn").onclick = () => {
     currentVideo.likes = (currentVideo.likes || 0) + 1;
     document.getElementById("likeBtn").innerText = `👍 ${currentVideo.likes} إعجاب`;
@@ -79,7 +76,7 @@ async function displayCurrentVideo() {
   };
 }
 
-// إدارة الكومنتات
+// الكومنتات
 function loadComments(videoId) {
   const section = document.getElementById("commentsSection");
   section.innerHTML = "";
@@ -97,7 +94,6 @@ function loadComments(videoId) {
   });
 }
 
-// إضافة تعليق جديد
 function addComment() {
   const input = document.getElementById("commentInput");
   const text = input.value.trim();
@@ -132,6 +128,58 @@ async function updateGist(newData) {
       }
     })
   });
-  const result = await res.json();
-  console.log("تم تحديث Gist:", result);
+  await res.json();
+}
+
+// رفع فيديو جديد
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadVideo() {
+  const title = document.getElementById("videoTitle").value.trim();
+  const videoFile = document.getElementById("videoFile").files[0];
+  const thumbnailFile = document.getElementById("thumbnailFile").files[0];
+  if (!title || !videoFile || !thumbnailFile) return alert("الرجاء إدخال جميع البيانات!");
+
+  const videoBase64 = await fileToBase64(videoFile);
+  const thumbnailBase64 = await fileToBase64(thumbnailFile);
+
+  const channelId = "1234567890";
+  let channel = dbData.channels.find(c => c.channelId === channelId);
+  if (!channel) {
+    channel = {
+      channelId,
+      channelName: "قناتي التجريبية",
+      channelUsername: "zyloxtube",
+      channelAvatarBase64: "data:image/png;base64,...",
+      subscribers: 0
+    };
+    dbData.channels.push(channel);
+  }
+
+  const newVideo = {
+    videoId: "v" + Date.now(),
+    title,
+    thumbnailBase64,
+    videoBase64,
+    duration: "00:00",
+    channelId,
+    views: 0,
+    likes: 0,
+    dislikes: 0
+  };
+
+  dbData.videos.push(newVideo);
+  await updateGist(dbData);
+  alert("تم رفع الفيديو بنجاح!");
+  document.getElementById("videoTitle").value = "";
+  document.getElementById("videoFile").value = "";
+  document.getElementById("thumbnailFile").value = "";
+  loadDBAndDisplayVideos();
 }
