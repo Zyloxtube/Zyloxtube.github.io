@@ -7,7 +7,19 @@
 </head>
 <body>
 <header><h1>📺 موقعي</h1></header>
+
+<!-- قسم رفع الفيديو -->
+<div class="upload-section">
+  <h3>رفع فيديو جديد</h3>
+  <input type="text" id="videoTitle" placeholder="عنوان الفيديو">
+  <input type="file" id="videoFile" accept="video/*">
+  <input type="file" id="thumbnailFile" accept="image/*">
+  <button onclick="uploadVideo()">رفع الفيديو</button>
+</div>
+
+<!-- قائمة الفيديوهات -->
 <div class="videos" id="videoList"></div>
+
 <script src="script.js"></script>
 <script>
   loadDBAndDisplayVideos();
